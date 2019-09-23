@@ -10,7 +10,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 
 
 app.get('/', function(req,res) {
-    res.send('hihi');
+    res.send('hihiss');
     console.log('h9h');
 });
 
