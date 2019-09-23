@@ -15,6 +15,7 @@ app.get('/', function(req,res) {
 });
 
 app.post('/', function (request, response) {
+    console.log("u trying bro?");
     const agent = new WebhookClient({ request, response });
     console.info(`agent set`);
 
