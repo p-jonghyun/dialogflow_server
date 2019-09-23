@@ -11,7 +11,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 
 app.get('/', function(req,res) {
     res.send('hihi');
-    console.log('h9h9');
+    console.log('h9h');
 });
 
 app.post('/', function (req, res) {
