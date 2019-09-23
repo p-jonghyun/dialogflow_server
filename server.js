@@ -14,29 +14,30 @@ app.get('/', function(req,res) {
     console.log('h9h');
 });
 
-app.post('/', function (req, res) {
-    const agent = new WebhookClient({request: req, response: res});
+app.post('/', function (request, response) {
+    const agent = new WebhookClient({ request, response });
     console.info(`agent set`);
+
+    function hihi (agent) {
+        agent.add('안녕하세요 존잘님~')
+    }
+    
+    function welcome (agent) {
+        agent.add(`Welcome to Express.JS webhook!`);
+    }
+    
+    function fallback (agent) {
+        agent.add(`I didn't understand`);
+        agent.add(`I'm sorry, can you try again?`);
+    }
 
     let intentMap = new Map();
     intentMap.set('Default Welcome Intent', welcome);
     intentMap.set('Default Fallback Intent', fallback);
     intentMap.set('hihi', hihi);
+
     agent.handleRequest(intentMap);
 });
-
-function hihi (agent) {
-    agent.add('안녕하세요 존잘님~')
-}
-
-function welcome (agent) {
-    agent.add(`Welcome to Express.JS webhook!`);
-}
-
-function fallback (agent) {
-    agent.add(`I didn't understand`);
-    agent.add(`I'm sorry, can you try again?`);
-}
 
 app.listen(8080, function () {
     console.info(`Webhook listening on port 8080!`)
