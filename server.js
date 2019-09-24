@@ -16,8 +16,8 @@ app.get('/', function(req,res) {
     console.log('h9h');
 });
 
-app.post('/', function (request, response) {
-    console.log("u trying bro?");
+app.post('/', express.json(), function (request, response) {
+    
     const agent = new WebhookClient({ request, response });
     console.info(`agent set`);
 
@@ -52,6 +52,6 @@ https.createServer({
 })
 
 */
-app.listen(3000, function () {
+app.listen(8080, function () {
     console.info(`Webhook listening on port 8080!`)
 });
