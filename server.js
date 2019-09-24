@@ -32,18 +32,19 @@ app.post('/', express.json(), function (request, response) {
     
     const agent = new WebhookClient({ request, response });
     console.info(`agent set`);
-    var led = `http://${config.url}/rest/control?object=000D6F000C13EE44&endpoint=${endpoint}&action=${action}`;
-    var endpoint = 2;
-    var action = 'off';
+    var led = `http://114.70.21.30/rest/control?object=000D6F000C13EE44&endpoint=2&action=off`;
     options.url = led;
 
     function hihi (agent) {
         agent.add('안녕하세요 종현님~');
 
         req.put(options, function (err, res, body) {
+            console.log('일단찍음')
+
             if(err) console.log(err);
             else {
-                console.log(body);
+                console.log(res);
+               // console.log(body);
             }
         });
     }
