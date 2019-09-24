@@ -5,11 +5,23 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const fs = require('fs');
 const https = require('https');
-
+const req = require('request');
+const config = require("./config.json");
 const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 
+
+const queryDevices = "http://" + config.url + "/rest/device";
+
+var options = {
+    url: queryDevices,
+    auth: {
+        user: config.username,
+        password: config.password,
+        sendImmediately: false
+    }
+}
 
 app.get('/', function(req,res) {
     res.send('hihiss');
@@ -20,9 +32,20 @@ app.post('/', express.json(), function (request, response) {
     
     const agent = new WebhookClient({ request, response });
     console.info(`agent set`);
+    var led = `http://${config.url}/rest/control?object=000D6F000C13EE44&endpoint=${endpoint}&action=${action}`;
+    var endpoint = 2;
+    var action = 'off';
+    options.url = led;
 
     function hihi (agent) {
-        agent.add('안녕하세요 존잘님~')
+        agent.add('안녕하세요 종현님~');
+
+        req.put(options, function (err, res, body) {
+            if(err) console.log(err);
+            else {
+                console.log(body);
+            }
+        });
     }
     
     function welcome (agent) {
