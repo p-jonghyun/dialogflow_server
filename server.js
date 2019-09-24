@@ -2,6 +2,7 @@
 
 const {WebhookClient} = require('dialogflow-fulfillment');
 const express = require('express');
+var mysql      = require('mysql');
 const bodyParser = require('body-parser');
 const fs = require('fs');
 const https = require('https');
@@ -12,8 +13,14 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 
 
-const queryDevices = "http://" + config.url + "/rest/device";
+var connection = mysql.createConnection({
+  host     : '13.209.234.251',
+  user     : 'jong1994',
+  password : 'asd159',
+  database : 'test'
+});
 
+const queryDevices = "http://" + config.url + "/rest/device";
 var options = {
     url: queryDevices,
     auth: {
@@ -32,10 +39,45 @@ app.post('/', express.json(), function (request, response) {
     
     const agent = new WebhookClient({ request, response });
     console.info(`agent set`);
-    var led = `http://114.70.21.30/rest/control?object=000D6F000C13EE44&endpoint=2&action=off`;
-    options.url = led;
+    
+    function mysql_message(agent) {
 
-    function hihi (agent) {
+        return new Promise((resolve, reject) => {
+            var name = '';
+            connection.connect();
+
+            connection.query('SELECT * FROM student', function (error, results, fields) {
+                if (error) {
+                    console.log(error);
+                }
+                name = results[0].sname;
+                agent.add(`영어로는 ${name}!`);
+                resolve();
+            });
+            connection.end();
+        });
+        /*
+        var name = '';
+        connection.connect();
+
+        connection.query('SELECT * FROM student', function (error, results, fields) {
+            if (error) {
+                console.log(error);
+            }
+            name = results[0].sname;
+        });
+
+        console.log(name);
+        if(name == 'jeff') agent.add(`영어로는 ${name}!`);
+        connection.end();
+        */
+    }
+
+    function ezex_control (agent) {
+
+        var led = `http://114.70.21.30/rest/control?object=000D6F000C13EE44&endpoint=2&action=off`;
+        options.url = led;
+
         agent.add('안녕하세요 종현님~');
 
         req.put(options, function (err, res, body) {
@@ -61,7 +103,8 @@ app.post('/', express.json(), function (request, response) {
     let intentMap = new Map();
     intentMap.set('Default Welcome Intent', welcome);
     intentMap.set('Default Fallback Intent', fallback);
-    intentMap.set('hihi', hihi);
+    intentMap.set('ezex', ezex_control);
+    intentMap.set('hihi', mysql_message);
 
     agent.handleRequest(intentMap);
 });
