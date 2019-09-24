@@ -1,8 +1,8 @@
 'use strict';
 
+// server & dialogflow setting
 const {WebhookClient} = require('dialogflow-fulfillment');
 const express = require('express');
-var mysql      = require('mysql');
 const bodyParser = require('body-parser');
 const fs = require('fs');
 const https = require('https');
@@ -12,14 +12,22 @@ const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 
-
+// mysql setting
+var mysql      = require('mysql');
 var connection = mysql.createConnection({
-  host     : '13.209.234.251',
-  user     : 'jong1994',
-  password : 'asd159',
-  database : 'test'
+    host     : '13.209.234.251',
+    user     : 'jong1994',
+    password : 'asd159',
+    database : 'test'
 });
 
+// mongodb setting
+var mongo_url = "mongodb://13.209.234.251:27017";
+var dbName = "test";
+var collectionName = "test";
+var MongoClient = require('mongodb').MongoClient
+
+// ejex setting
 const queryDevices = "http://" + config.url + "/rest/device";
 var options = {
     url: queryDevices,
@@ -41,11 +49,9 @@ app.post('/', express.json(), function (request, response) {
     console.info(`agent set`);
     
     function mysql_message(agent) {
-
         return new Promise((resolve, reject) => {
             var name = '';
             connection.connect();
-
             connection.query('SELECT * FROM student', function (error, results, fields) {
                 if (error) {
                     console.log(error);
@@ -56,23 +62,23 @@ app.post('/', express.json(), function (request, response) {
             });
             connection.end();
         });
-        /*
-        var name = '';
-        connection.connect();
-
-        connection.query('SELECT * FROM student', function (error, results, fields) {
-            if (error) {
-                console.log(error);
-            }
-            name = results[0].sname;
-        });
-
-        console.log(name);
-        if(name == 'jeff') agent.add(`영어로는 ${name}!`);
-        connection.end();
-        */
     }
 
+    function mongo_message (agent) {
+        return new Promise((resolve, reject) => {
+            MongoClient.connect(mongo_url, {useNewUrlParser:true, useUnifiedTopology: true}, function(err, db) {
+
+                var dbo = db.db("test");                                            
+                dbo.collection("test").find().toArray(function(err,data){ 
+                    var name = data[1].name
+                    agent.add(`몽고DB로는 ${name}!`);
+                    resolve();
+                }); 
+                db.close();
+            });
+        });
+    }
+    
     function ezex_control (agent) {
 
         var led = `http://114.70.21.30/rest/control?object=000D6F000C13EE44&endpoint=2&action=off`;
@@ -103,8 +109,9 @@ app.post('/', express.json(), function (request, response) {
     let intentMap = new Map();
     intentMap.set('Default Welcome Intent', welcome);
     intentMap.set('Default Fallback Intent', fallback);
+    intentMap.set('hihi', mongo_message);
     intentMap.set('ezex', ezex_control);
-    intentMap.set('hihi', mysql_message);
+    intentMap.set('sql', mysql_message);
 
     agent.handleRequest(intentMap);
 });
