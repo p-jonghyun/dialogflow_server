@@ -57,7 +57,7 @@ app.post('/', express.json(), function (request, response) {
                     console.log(error);
                 }
                 name = results[0].sname;
-                agent.add(`영어로는 ${name}!`);
+                agent.add(`MySQL로는 ${name}!`);
                 resolve();
             });
             connection.end();
@@ -78,7 +78,7 @@ app.post('/', express.json(), function (request, response) {
             });
         });
     }
-    
+
     function ezex_control (agent) {
 
         var led = `http://114.70.21.30/rest/control?object=000D6F000C13EE44&endpoint=2&action=off`;
