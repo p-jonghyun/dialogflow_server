@@ -7,7 +7,6 @@ const bodyParser = require('body-parser');
 const fs = require('fs');
 const https = require('https');
 const req = require('request');
-const config = require("./config.json");
 const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
@@ -28,9 +27,11 @@ var collectionName = "test";
 var MongoClient = require('mongodb').MongoClient
 
 // ejex setting
-const queryDevices = "http://" + config.url + "/rest/device";
+const config = require("./config.json");
+var endpoint = '';
+var action = '';
 var options = {
-    url: queryDevices,
+    url: `http://${config.url}/rest/control?object=000D6F000C13EE44&endpoint=${endpoint}&action=${action}`,
     auth: {
         user: config.username,
         password: config.password,
@@ -80,22 +81,26 @@ app.post('/', express.json(), function (request, response) {
     }
 
     function ezex_control (agent) {
+        return new Promise((resolve, reject) => {
 
-        var led = `http://114.70.21.30/rest/control?object=000D6F000C13EE44&endpoint=2&action=off`;
-        options.url = led;
+            endpoint = 2;
+            action = 'off';
+            var led = `http://${config.url}/rest/control?object=000D6F000C13EE44&endpoint=${endpoint}&action=${action}`;
+            options.url = led;
 
-        agent.add('안녕하세요 종현님~');
-
-        req.put(options, function (err, res, body) {
-            console.log('일단찍음')
-
-            if(err) console.log(err);
-            else {
-                console.log(res);
-               // console.log(body);
-            }
+            req.put(options, function (err, res, body) {
+                console.log('일단찍음')
+                if(err) console.log(err);
+                else {
+                   console.log(options.url);
+                   console.log(body);
+                   agent.add('안녕하세요 종현님~');
+                   resolve();
+                }
+            });
         });
     }
+
     
     function welcome (agent) {
         agent.add(`Welcome to Express.JS webhook!`);
@@ -109,8 +114,8 @@ app.post('/', express.json(), function (request, response) {
     let intentMap = new Map();
     intentMap.set('Default Welcome Intent', welcome);
     intentMap.set('Default Fallback Intent', fallback);
-    intentMap.set('hihi', mongo_message);
-    intentMap.set('ezex', ezex_control);
+    intentMap.set('mongo', mongo_message);
+    intentMap.set('hihi', ezex_control);
     intentMap.set('sql', mysql_message);
 
     agent.handleRequest(intentMap);
