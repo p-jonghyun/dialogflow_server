@@ -40,11 +40,83 @@ app.post('/', express.json(), function (request, response) {
     }
 
     function lightOnOff(agent) {
+        return new Promise((resolve, reject) => {
+            MongoClient.connect(mongo_url, {useNewUrlParser:true, useUnifiedTopology: true}, function(err, db) {
 
+                var location = agent.parameters['ezex_location'];
+                var object_name = agent.parameters['ezex_light_object_name'];
+                var action = agent.parameters['lightOnorOff'];
+
+                if (action == '켜줘') action = 'on';
+                else action = 'off';
+
+                var dbo = db.db("dialogflow"); 
+                const query = {
+                    "location" : location,
+                    "object_name" :  object_name
+                }
+            
+                dbo.collection("prototype").find(query).toArray(function(err,data){ 
+                    var object_id = data[0].object_id;
+                    var endpoint = data[0].endpoint;
+                    var led = `http://${config.url}/rest/control?object=${object_id}&endpoint=${endpoint}&action=${action}`;
+                    options.url = led;
+                    console.log(options);
+
+                    req.put(options, function (err, res, body) {
+                        if(err) console.log(err);
+                        else console.log(body);
+
+                        if(action == 'on') action = '키';
+                        else action = '끄';
+                        agent.add(`${location}에 ${object_name} 불을 ${action}겠습니다`)
+                        resolve();
+                    });
+                }); 
+                db.close();
+            });
+        });
     }
 
     function lightOnOffDelayed(agent) {
+        return new Promise((resolve, reject) => {
+            MongoClient.connect(mongo_url, {useNewUrlParser:true, useUnifiedTopology: true}, function(err, db) {
 
+                var location = agent.parameters['ezex_location'];
+                var object_name = agent.parameters['ezex_light_object_name'];
+                var action = agent.parameters['lightOnorOff'];
+                var time = agent.parameters['number-integer'];
+                console.log(time);
+
+                if (action == '켜줘') action = 'on';
+                else action = 'off';
+
+                var dbo = db.db("dialogflow"); 
+                const query = {
+                    "location" : location,
+                    "object_name" :  object_name
+                }
+            
+                dbo.collection("prototype").find(query).toArray(function(err,data){ 
+                    var object_id = data[0].object_id;
+                    var endpoint = data[0].endpoint;
+                    var led = `http://${config.url}/rest/control?object=${object_id}&endpoint=${endpoint}&action=${action}`;
+                    options.url = led;
+                    console.log(options);
+
+                    req.put(options, function (err, res, body) {
+                        if(err) console.log(err);
+                        else console.log(body);
+
+                        if(action == 'on') action = '키';
+                        else action = '끄';
+                        agent.add(`${location}에 ${object_name} 불을 ${action}겠습니다`)
+                        resolve();
+                    });
+                }); 
+                db.close();
+            });
+        });
     }
 
     function thermoControl(agent) {
