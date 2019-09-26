@@ -35,7 +35,7 @@ app.post('/', express.json(), function (request, response) {
 
     }
     
-    function howManyInsances(agent) {
+    function howManyInstances(agent) {
 
     }
 
@@ -80,7 +80,7 @@ app.post('/', express.json(), function (request, response) {
     intentMap.set('Default Welcome Intent', welcome);
     intentMap.set('Default Fallback Intent', fallback);
     intentMap.set('howManyDevices', howManyDevices);
-    intentMap.set('howManyInsances', howManyInsances);
+    intentMap.set('howManyInstances', howManyInstances);
     intentMap.set('lightOnOff', lightOnOff);
     intentMap.set('lightOnOffDelayed', lightOnOffDelayed);
     intentMap.set('thermoControl', thermoControl);
